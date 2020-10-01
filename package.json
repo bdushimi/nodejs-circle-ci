@@ -1,0 +1,44 @@
+{
+  "name": "personal-blog-api",
+  "version": "1.0.0",
+  "description": "my personal website and blog rest api using nodejs express and mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive --exit",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kabano89/personal-blog-api.git"
+  },
+  "keywords": [
+    "restapi",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "KABANO gilles",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kabano89/personal-blog-api/issues"
+  },
+  "homepage": "https://github.com/kabano89/personal-blog-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mockgoose": "^8.0.4",
+    "mongoose": "^5.10.7",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "supertest": "^5.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.1.3",
+    "nodemon": "^2.0.4"
+  }
+}
