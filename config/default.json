@@ -1,0 +1,3 @@
+{
+	"DBHost" : "mongodb+srv://kabano:kabano@blogcluster.iyf1s.mongodb.net/<dbname>?retryWrites=true&w=majority"
+}
