@@ -9,7 +9,7 @@ install:
   - npm ci
 
 script:
-  -npm run coveralls
+  - npm run coveralls
 
 notifications:
   email: false
