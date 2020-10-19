@@ -9,7 +9,7 @@ function getArticles(req, res) {
 	//Query the DB and if no errors, send all the articles
 	let query = Article.find({});
 	query.exec((err, articles) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(articles);
 	});
@@ -42,7 +42,7 @@ function postArticle(req, res) {
  */
 function getArticle(req, res) {
 	Article.findById(req.params.id, (err, article) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(article);
 	});		
@@ -62,9 +62,9 @@ function deleteArticle(req, res) {
  */
 function updateArticle(req, res) {
 	Article.findById({_id: req.params.id}, (err, article) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(article, req.body).save((err, article) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Article updated!', article });
 		});	
 	});

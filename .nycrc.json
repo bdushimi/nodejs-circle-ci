@@ -1,0 +1,10 @@
+{
+    "include": [
+        "app/controllers",
+        "app/middleware",
+        "app/routes"
+    ],
+    "exclude": [
+        "app/models"
+    ]
+}

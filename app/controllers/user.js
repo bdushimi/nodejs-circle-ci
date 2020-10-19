@@ -1,119 +1,177 @@
-let mongoose = require('mongoose');
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-let User = require('../models/user');
+/**
+ * /api/routes.js
+ * exports an express router.
+ */ 
 
+//to generate the JWT
+const jwt = require('jsonwebtoken');
 
-/*
- * GET /user route to retrieve all the users.
- */
-function user_signup(req, res) {
-	User.find({ email: req.body.email })
-    .exec()
-    .then(user => {
-      if (user.length >= 1) {
-        return res.status(409).json({
-          message: "Mail exists"
+//database
+const mongoose = require('mongoose');
+//import User
+//const User = require('./user');
+const User = require('../models/user');
+
+//to encrypt
+const bcrypt = require('bcrypt');
+
+function user_signup(req, res, next) {
+//router.post('/register', (req, res, next) => {
+  let hasErrors = false ;
+  let errors = [];
+  
+//   if(!req.body.name){
+//   //validate name presence in the request
+//     errors.push({'name': 'Name not received'})
+//     hasErrors = true;
+//   }
+  if(!req.body.email){
+    //validate email presence in the request
+    errors.push({'email': 'Email not received'})
+    hasErrors = true;
+  }
+  if(!req.body.password){
+    //validate password presence in the request
+    errors.push({'password': 'Password not received'})
+    hasErrors = true;
+  }
+
+  if(hasErrors){
+    //if there is any missing field
+    res.status(401).json({
+      message: "Invalid input",
+      errors: errors
+    });
+
+  }else{
+  //if all fields are present
+   //check if mail already exists
+   User.findOne({'email': req.body.email}).then((doc, err) => {
+    if(doc){
+      //if email already exists in DB, send error
+      errors.push({email: 'Email already registered'});
+      res.status(422).json({
+        message: "Invalid email",
+        errors: errors
+      })
+    }else{
+      //encrypt user password
+      bcrypt.hash(req.body.password, 10, (err, hashed_password) => {
+        if(err){
+          //error hashing the password
+          errors.push({
+            hash: err.message
+          });
+          return res.status(500).json(errors);
+        }else{
+          //if password is hashed
+          //create the user with the model
+          const new_user = new User({
+            //assign request fields to the user attributes
+            email: req.body.email,
+            password: hashed_password
+          });
+          //save in the database
+          new_user.save().then(saved_user => {
+          //return 201, message and user details
+            res.status(201).json({
+              message: 'User registered',
+              user: saved_user,
+              errors: errors
+            });
+          }).catch(err => {
+          //failed to save in database
+            errors.push(new Error({
+              db: err.message
+            }))
+            res.status(500).json(errors);
+          })
+        }
+      });
+    }
+  })
+
+  }
+
+}
+
+function user_login(req, res, next){
+
+//router.post('/login', (req, res, next) => {
+  let hasErrors = false ;
+  let errors = [];
+
+  //validate presence of email and password
+  if(!req.body.email){
+    errors.push({'email': 'Email not received'})
+    hasErrors = true;
+  }
+  if(!req.body.password){
+    errors.push({'password': 'Password not received'})
+    hasErrors = true;
+  }
+
+  if(hasErrors){
+  //return error code an info
+    res.status(422).json({
+      message: "Invalid input",
+      errors: errors
+    });
+
+  }else{
+  //check if credentials are valid
+    //try to find user in database by email
+    User.findOne({'email': req.body.email}).then((found_user, err) => {
+      if(!found_user){
+        //return error, user is not registered
+        res.status(401).json({
+          message: "Auth error, email not found"
         });
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            return res.status(500).json({
-              error: err
-            });
-          } else {
-            const user = new User({
-              email: req.body.email,
-              password: hash
-            });
-            user
-              .save()
-              .then(result => {
-                console.log(result);
-                res.status(201).json({
-                  message: "User created"
-                });
-              })
-              .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                  error: err
-                });
-              });
+      }else{
+        //validate password
+        bcrypt.compare(req.body.password, found_user.password, (err, isValid) => {
+          if(err){
+            //if compare method fails, return error
+            res.status(500).json({
+              message: err.message
+            }) 
+          }
+          if(!isValid){
+            //return error, incorrect password
+            res.status(401).json({
+              message: "Auth error"
+            }) 
+          }else{
+            //generate JWT token. jwt.sing() receives payload, key and opts.
+            const token = jwt.sign(
+              {
+                email: req.body.email, 
+              }, 
+              process.env.JWT_KEY, 
+              {
+                expiresIn: "1h"
+              }
+            );
+            //validation OK
+            res.status(200).json({
+              message: 'Auth OK',
+              token: token,
+              errors: errors
+            })
           }
         });
       }
     });
-}
-
-/*
- * POST /user to save a new user.
- */
-function user_login(req, res) {
-	User.find({ email: req.body.email })
-    .exec()
-    .then(user => {
-      if (user.length < 1) {
-        return res.status(401).json({
-          message: "Auth failed"
-        });
-      }
-      bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-        if (err) {
-          return res.status(401).json({
-            message: "Auth failed"
-          });
-        }
-        if (result) {
-          const token = jwt.sign(
-            {
-              email: user[0].email,
-              userId: user[0]._id
-			},
-			      //"secret",
-            process.env.JWT_KEY,
-            {
-              expiresIn: "1h"
-            }
-          );
-          return res.status(200).json({
-            message: "Auth successful",
-            token: token
-          });
-        }
-        res.status(401).json({
-          message: "Auth failed"
-        });
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
-}
+  
+  }
+}//);
 
 
-/*
- * DELETE /user/:id to delete a user given its id.
- */
 function user_delete(req, res) {
-	User.remove({ _id: req.params.id })
-    .exec()
-    .then(result => {
-      res.status(200).json({
-        message: "User deleted"
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+	User.remove({_id : req.params.id}, (err, result) => {
+		res.json({ message: "User deleted!", result });
+	});
 }
-
 
 
 //export all the functions

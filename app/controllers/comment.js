@@ -9,7 +9,7 @@ function getComments(req, res) {
 	//Query the DB and if no errors, send all the comments
 	let query = Comment.find({});
 	query.exec((err, comments) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(comments);
 	});
@@ -42,7 +42,7 @@ function postComment(req, res) {
  */
 function getComment(req, res) {
 	Comment.findById(req.params.id, (err, comment) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(comment);
 	});		
@@ -62,9 +62,9 @@ function deleteComment(req, res) {
  */
 function updateComment(req, res) {
 	Comment.findById({_id: req.params.id}, (err, comment) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(comment, req.body).save((err, comment) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Comment updated!', comment });
 		});	
 	});

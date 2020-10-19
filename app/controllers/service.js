@@ -9,7 +9,7 @@ function getServices(req, res) {
 	//Query the DB and if no errors, send all the services
 	let query = Service.find({});
 	query.exec((err, services) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(services);
 	});
@@ -42,7 +42,7 @@ function postService(req, res) {
  */
 function getService(req, res) {
 	Service.findById(req.params.id, (err, service) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(service);
 	});		
@@ -62,9 +62,9 @@ function deleteService(req, res) {
  */
 function updateService(req, res) {
 	Service.findById({_id: req.params.id}, (err, service) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(service, req.body).save((err, service) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Service updated!', service });
 		});	
 	});

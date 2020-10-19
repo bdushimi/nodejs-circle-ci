@@ -10,6 +10,7 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../server');
 let should = chai.should();
+let expect = chai.expect();
 const fs = require('fs');
 
 
@@ -28,16 +29,16 @@ describe('Articles', () => {
   describe('/GET article', () => {
 	  it('it should GET all the articles', (done) => {
 			chai.request(server)
-		    .get('/article')
+			.get('/article')
 		    .end((err, res) => {
 			  	res.should.have.status(200);
 			  	res.body.should.be.a('array');
 			  	res.body.length.should.be.eql(0);
-		      done();
+			  done();
+			
 		    });
 	  });
-
-	  
+		  
   });
 
    /*

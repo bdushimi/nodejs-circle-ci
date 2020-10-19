@@ -9,7 +9,7 @@ function getProfessions(req, res) {
 	//Query the DB and if no errors, send all the professions
 	let query = Profession.find({});
 	query.exec((err, professions) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(professions);
 	});
@@ -42,7 +42,7 @@ function postProfession(req, res) {
  */
 function getProfession(req, res) {
 	Profession.findById(req.params.id, (err, profession) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(profession);
 	});		
@@ -62,9 +62,9 @@ function deleteProfession(req, res) {
  */
 function updateProfession(req, res) {
 	Profession.findById({_id: req.params.id}, (err, profession) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(profession, req.body).save((err, profession) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Profession updated!', profession });
 		});	
 	});

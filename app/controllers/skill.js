@@ -9,7 +9,7 @@ function getSkills(req, res) {
 	//Query the DB and if no errors, send all the skills
 	let query = Skill.find({});
 	query.exec((err, skills) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(skills);
 	});
@@ -42,7 +42,7 @@ function postSkill(req, res) {
  */
 function getSkill(req, res) {
 	Skill.findById(req.params.id, (err, skill) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(skill);
 	});		
@@ -62,9 +62,9 @@ function deleteSkill(req, res) {
  */
 function updateSkill(req, res) {
 	Skill.findById({_id: req.params.id}, (err, skill) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(skill, req.body).save((err, skill) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Skill updated!', skill });
 		});	
 	});

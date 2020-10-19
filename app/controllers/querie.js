@@ -9,7 +9,7 @@ function getQueries(req, res) {
 	//Query the DB and if no errors, send all the queries
 	let query = Querie.find({});
 	query.exec((err, queries) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send them back to the client
 		res.json(queries);
 	});
@@ -42,7 +42,7 @@ function postQuerie(req, res) {
  */
 function getQuerie(req, res) {
 	Querie.findById(req.params.id, (err, querie) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		//If no errors, send it back to the client
 		res.json(querie);
 	});		
@@ -62,9 +62,9 @@ function deleteQuerie(req, res) {
  */
 function updateQuerie(req, res) {
 	Querie.findById({_id: req.params.id}, (err, querie) => {
-		if(err) res.send(err);
+		//if(err) res.send(err);
 		Object.assign(querie, req.body).save((err, querie) => {
-			if(err) res.send(err);
+			//if(err) res.send(err);
 			res.json({ message: 'Querie updated!', querie });
 		});	
 	});
