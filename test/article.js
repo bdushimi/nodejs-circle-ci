@@ -54,7 +54,7 @@ describe('Articles', () => {
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
 		 .attach('articleImage',
-		   fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+		   fs.readFileSync('./home/kabano/amafoto/malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
