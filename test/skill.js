@@ -13,6 +13,7 @@ const fs = require('fs');
 
 
 chai.use(chaiHttp);
+let token = '';
 
 //Our parent block
 describe('Skills', () => {
@@ -46,13 +47,23 @@ describe('Skills', () => {
   describe('/POST skill', () => {
 	
 	it('it should not POST a skill without title field', (done) => {
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+			.send(valid_input)
+			.then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
 		chai.request(server)
 		 .post('/skill')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
-		 .attach('skillImage',
-		   fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+		 .attach('skillImage', fs.readFileSync('malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
@@ -61,17 +72,17 @@ describe('Skills', () => {
 			res.body.errors.title.should.have.property('kind').eql('required');
 		 done();
 	  });
+	});
    });
 	//start
 	it('it should POST an skill', (done) => {
 		   chai.request(server)
 			.post('/skill')
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('title', 'html')
 			.field('content', 'html is awesomee')
-			.attach('skillImage',
-			  fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+			.attach('skillImage', fs.readFileSync('malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
@@ -93,7 +104,7 @@ describe('Skills', () => {
 	  	skill.save((err, skill) => {
 	  		chai.request(server)
 			.get('/skill/' + skill.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(skill)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -118,7 +129,7 @@ describe('Skills', () => {
 		skill.save((err, skill) => {
 			  chai.request(server)
 			  .put('/skill/' + skill.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({title: "Java basics", content: "java", skillImage: "image lorem" })
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -139,7 +150,7 @@ describe('/DELETE/:id skill', () => {
 		skill.save((err, skill) => {
 			  chai.request(server)
 			  .delete('/skill/' + skill.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');

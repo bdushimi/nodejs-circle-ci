@@ -14,6 +14,7 @@ const fs = require('fs');
 
 
 chai.use(chaiHttp);
+let token = '';
 
 //Our parent block
 describe('Services', () => {
@@ -47,13 +48,23 @@ describe('Services', () => {
   describe('/POST service', () => {
 	
 	it('it should not POST an service without title field', (done) => {
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+			.send(valid_input)
+			.then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
 		chai.request(server)
 		 .post('/service')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
-		 .attach('serviceImage',
-		   fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+		 .attach('serviceImage', fs.readFileSync('malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
@@ -62,17 +73,17 @@ describe('Services', () => {
 			res.body.errors.title.should.have.property('kind').eql('required');
 		 done();
 	  });
+	});
    });
 	//start
 	it('it should POST an service', (done) => {
 		   chai.request(server)
 			.post('/service')
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('title', 'html')
 			.field('content', 'html is awesomee')
-			.attach('serviceImage',
-			  fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+			.attach('serviceImage', fs.readFileSync('malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
@@ -94,7 +105,7 @@ describe('Services', () => {
 	  	service.save((err, service) => {
 	  		chai.request(server)
 			.get('/service/' + service.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(service)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -119,7 +130,7 @@ describe('Services', () => {
 		service.save((err, service) => {
 			  chai.request(server)
 			  .put('/service/' + service.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({title: "Java basics", content: "java", serviceImage: "image lorem" })
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -140,7 +151,7 @@ describe('/DELETE/:id service', () => {
 		service.save((err, service) => {
 			  chai.request(server)
 			  .delete('/service/' + service.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');

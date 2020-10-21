@@ -14,6 +14,8 @@ const fs = require('fs');
 
 
 chai.use(chaiHttp);
+//to hold the token
+let token = '';
 
 //Our parent block
 describe('Queries', () => {
@@ -47,9 +49,21 @@ describe('Queries', () => {
   describe('/POST querie', () => {
 	
 	it('it should not POST an querie without email field', (done) => {
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+			.send(valid_input)
+			.then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
+
 		chai.request(server)
 		 .post('/querie')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('names', 'kabano')
 		 .field('subject', 'lorem ipsum')
@@ -62,6 +76,7 @@ describe('Queries', () => {
 			res.body.errors.email.should.have.property('kind').eql('required');
 		 done();
 	  });
+	});
    });
 	//start
 	  it('it should POST a querie ', (done) => {
@@ -73,7 +88,7 @@ describe('Queries', () => {
 		}
 		  chai.request(server)
 		  .post('/querie')
-		  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		  .set('Authorization', token)
 		  .send(querie)
 		  .end((err, res) => {
 				res.should.have.status(200);
@@ -97,7 +112,7 @@ describe('Queries', () => {
 	  	querie.save((err, querie) => {
 	  		chai.request(server)
 			.get('/querie/' + querie.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(querie)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -123,7 +138,7 @@ describe('Queries', () => {
 		querie.save((err, querie) => {
 			  chai.request(server)
 			  .put('/querie/' + querie.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({ names: "kabano", email: "kabano@gmail", subject: "lorem hahha", message: "lorem"})
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -144,7 +159,7 @@ describe('/DELETE/:id querie', () => {
 		querie.save((err, querie) => {
 			  chai.request(server)
 			  .delete('/querie/' + querie.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');

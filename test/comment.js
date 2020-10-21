@@ -15,6 +15,8 @@ const fs = require('fs');
 
 
 chai.use(chaiHttp);
+//to hold the token
+let token = '';
 
 //Our parent block
 describe('Comments', () => {
@@ -48,9 +50,20 @@ describe('Comments', () => {
   describe('/POST comment', () => {
 	
 	it('it should not POST an comment without email field', (done) => {
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+			.send(valid_input)
+			.then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
 		chai.request(server)
 		 .post('/comment')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('article_id', 'idididididdi')
 		 .field('names', 'kabano')
@@ -63,28 +76,8 @@ describe('Comments', () => {
 			res.body.errors.email.should.have.property('kind').eql('required');
 		 done();
 	  });
+	});
    });
-	//start
-	// it('it should POST a comment', (done) => {
-	// 	   chai.request(server)
-	// 		.post('/comment')
-	// 		.set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtlbGx5QGdtYWlsLmNvbSIsInVzZXJJZCI6IjVmN2FjMDRlM2M5MGFlYWI0YTYxYmNhZCIsImlhdCI6MTYwMTkxMDU4MCwiZXhwIjoxNjAxOTE0MTgwfQ.bUZFlGdd9UM2ECRS4oE3BMfpV6vQwcFvX2tFXZBvbFY')
-	// 		.set('Content-Type', 'application/x-www-form-urlencoded')
-	// 		.field('names', 'kabano')
-	// 		.field('email', 'kabano@gmail.com')
-	// 	 	.field('subject', 'lorem ipsum')
-	// 	 	.field('message', 'lorem ipsum')
-	// 	  .end((err, res) => {
-	// 			res.should.have.status(200);
-	// 			res.body.should.be.a('object');  
-	// 			res.body.should.have.property('message').eql('Comment successfully added!');
-	// 			res.body.comment.should.have.property('names');
-	// 			res.body.comment.should.have.property('email');
-	// 			res.body.comment.should.have.property('subject');
-	// 			res.body.comment.should.have.property('message');
-	// 		done();
-	//      });
-	//   });
 
 	  it('it should POST a comment ', (done) => {
 		let comment = {
@@ -95,7 +88,7 @@ describe('Comments', () => {
 		}
 		  chai.request(server)
 		  .post('/comment')
-		  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		  .set('Authorization', token)
 		  .send(comment)
 		  .end((err, res) => {
 				res.should.have.status(200);
@@ -119,7 +112,7 @@ describe('Comments', () => {
 	  	comment.save((err, comment) => {
 	  		chai.request(server)
 			.get('/comment/' + comment.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(comment)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -145,7 +138,7 @@ describe('Comments', () => {
 		comment.save((err, comment) => {
 			  chai.request(server)
 			  .put('/comment/' + comment.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({ article_id: "akakakak", names: "kabano", email: "kabano@gmail.com", comment: "lorem ipsum"})
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -166,7 +159,7 @@ describe('/DELETE/:id comment', () => {
 		comment.save((err, comment) => {
 			  chai.request(server)
 			  .delete('/comment/' + comment.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');

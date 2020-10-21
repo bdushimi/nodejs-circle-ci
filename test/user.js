@@ -19,6 +19,9 @@ const User = require('../app/models/user');
 //bcrypt
 const bcrypt = require('bcrypt');
 
+//token
+let token = '';
+
 describe('App basic tests', () => {
   
   before( (done) => {
@@ -262,11 +265,23 @@ describe('User login', () => {
   });
 });
 
+
 /*
 		* Test the /DELETE/:id route
 		*/
 		describe('Delete a user', () => {
 			it('it should DELETE a user given the id', (done) => {
+        //Mock login
+        const valid_input = {
+          "email": "john@gmail.com",
+          "password": "secret"
+        }
+        //send login
+        chai.request(server).post('/user/login')
+          .send(valid_input)
+          .then((login_response) => {
+          //add token
+          token = 'Bearer ' + login_response.body.token;
 				let user = new User({
 					email: "kabano8@gmail.com",
 					password: "lorem"
@@ -274,7 +289,7 @@ describe('User login', () => {
 				user.save((err, user) => {
 					  chai.request(server)
 					  .delete('/user/' + user.id)
-					  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+					  .set('Authorization', token)
 					  .end((err, res) => {
 							res.should.have.status(200);
 							res.body.should.be.a('object');
@@ -284,5 +299,6 @@ describe('User login', () => {
 						done();
 					  });
 				});
-			});
+      });
+    });
 		});

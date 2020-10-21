@@ -14,6 +14,8 @@ const fs = require('fs');
 
 
 chai.use(chaiHttp);
+//to hold the token
+let token = '';
 
 //Our parent block
 describe('Professions', () => {
@@ -47,13 +49,24 @@ describe('Professions', () => {
   describe('/POST profession', () => {
 	
 	it('it should not POST an profession without profession title field', (done) => {
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+			.send(valid_input)
+			.then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
+
 		chai.request(server)
 		 .post('/profession')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('welcomeMessage', 'hello welcome')
-		 .attach('professionImage',
-		   fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+		 .attach('professionImage', fs.readFileSync('malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
@@ -62,17 +75,17 @@ describe('Professions', () => {
 			res.body.errors.professionTitle.should.have.property('kind').eql('required');
 		 done();
 	  });
+	});
    });
 	//start
 	it('it should POST an profession', (done) => {
 		   chai.request(server)
 			.post('/profession')
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('welcomeMessage', 'Hello')
 			.field('professionTitle', 'web dev')
-			.attach('professionImage',
-			  fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+			.attach('professionImage', fs.readFileSync('malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
@@ -94,7 +107,7 @@ describe('Professions', () => {
 	  	profession.save((err, profession) => {
 	  		chai.request(server)
 			.get('/profession/' + profession.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(profession)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -119,7 +132,7 @@ describe('Professions', () => {
 		profession.save((err, profession) => {
 			  chai.request(server)
 			  .put('/profession/' + profession.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({welcomeMessage: "Java basics", professionTitle: "java", professionImage: "image lorem" })
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -140,7 +153,7 @@ describe('/DELETE/:id profession', () => {
 		profession.save((err, profession) => {
 			  chai.request(server)
 			  .delete('/profession/' + profession.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');

@@ -16,6 +16,9 @@ const fs = require('fs');
 
 chai.use(chaiHttp);
 
+//to hold the token
+let token = '';
+
 //Our parent block
 describe('Articles', () => {
 	beforeEach((done) => { //Before each test we empty the database
@@ -46,34 +49,45 @@ describe('Articles', () => {
   */
 
   describe('/POST article', () => {
-	
+
 	it('it should not POST an article without title field', (done) => {
-		chai.request(server)
+		//Mock login
+		const valid_input = {
+			"email": "john@gmail.com",
+			"password": "secret"
+		}
+		//send login
+		chai.request(server).post('/user/login')
+		  .send(valid_input)
+		   .then((login_response) => {
+			//add token
+			token = 'Bearer ' + login_response.body.token;
+		 chai.request(server)
 		 .post('/article')
-		 .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
-		 .attach('articleImage',
-		   fs.readFileSync('./home/kabano/amafoto/malume.png'), 'malume.png')
-	   .end((err, res) => {
-			res.should.have.status(200);
-			res.body.should.be.a('object');
-			res.body.should.have.property('errors');
-			res.body.errors.should.have.property('title');
-			res.body.errors.title.should.have.property('kind').eql('required');
-		 done();
-	  });
+		 .attach('articleImage', fs.readFileSync('malume.png'), 'malume.png')
+		.end((err, res) => {
+				res.should.have.status(200);
+				res.body.should.be.a('object');
+				res.body.should.have.property('errors');
+				res.body.errors.should.have.property('title');
+				res.body.errors.title.should.have.property('kind').eql('required');
+			done();
+		});
+	});
    });
+   //end here
 	//start
 	it('it should POST an article', (done) => {
 		   chai.request(server)
 			.post('/article')
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('title', 'html')
 			.field('content', 'html is awesomee')
-			.attach('articleImage',
-			  fs.readFileSync('/home/kabano/amafoto/malume.png'), 'malume.png')
+			.attach('articleImage', fs.readFileSync('malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
@@ -95,7 +109,7 @@ describe('Articles', () => {
 	  	article.save((err, article) => {
 	  		chai.request(server)
 			.get('/article/' + article.id)
-			.set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			.set('Authorization', token)
 		    .send(article)
 		    .end((err, res) => {
 			  	res.should.have.status(200);
@@ -120,7 +134,7 @@ describe('Articles', () => {
 		article.save((err, article) => {
 			  chai.request(server)
 			  .put('/article/' + article.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .send({title: "Java basics", content: "java", articleImage: "image lorem" })
 			  .end((err, res) => {
 					res.should.have.status(200);
@@ -141,7 +155,7 @@ describe('/DELETE/:id article', () => {
 		article.save((err, article) => {
 			  chai.request(server)
 			  .delete('/article/' + article.id)
-			  .set('Authorization', 'Bearer ' + process.env.authenticationToken)
+			  .set('Authorization', token)
 			  .end((err, res) => {
 					res.should.have.status(200);
 					res.body.should.be.a('object');
@@ -156,5 +170,6 @@ describe('/DELETE/:id article', () => {
 
 
 });
+
 
   

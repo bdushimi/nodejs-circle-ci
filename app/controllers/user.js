@@ -166,6 +166,15 @@ function user_login(req, res, next){
   }
 }//);
 
+function protected_route(req, res, next) {
+
+  res.status(200).json({
+    message: 'Welcome, your email is ' + req.userData.email,
+    user: req.userData,
+    errors: [],
+  })
+}
+
 
 function user_delete(req, res) {
 	User.remove({_id : req.params.id}, (err, result) => {
@@ -175,4 +184,4 @@ function user_delete(req, res) {
 
 
 //export all the functions
-module.exports = { user_signup, user_login, user_delete };
+module.exports = { user_signup, user_login, protected_route, user_delete };

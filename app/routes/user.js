@@ -9,6 +9,8 @@ router.post("/signup", UsersController.user_signup);
 
 router.post("/login", UsersController.user_login);
 
+router.get('/protected', checkAuth, UsersController.protected_route);
+
 router.delete("/:id", checkAuth, UsersController.user_delete);
 
 
