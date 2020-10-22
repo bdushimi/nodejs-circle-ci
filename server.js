@@ -26,9 +26,17 @@ let options = {
               }; 
 
 //db connection      
-mongoose.connect(config.DBHost, options);
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+// mongoose.connect(config.DBHost, options);
+// let db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error:'));
+mongoose.set('useUnifiedTopology', true);
+
+mongoose.connect(config.DBHost, options, { useNewUrlParser: true }, (err) => {
+	if (err)
+	   console.error(err);
+	else
+	   console.log("Connected to the mongodb"); 
+});
 
 //don't show the log when it is test
 if(config.util.getEnv('NODE_ENV') !== 'test') {

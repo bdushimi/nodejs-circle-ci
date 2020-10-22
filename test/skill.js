@@ -63,7 +63,7 @@ describe('Skills', () => {
 		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
-		 .attach('skillImage', fs.readFileSync('malume.png'), 'malume.png')
+		 .attach('skillImage', fs.readFileSync('./test/malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
@@ -82,7 +82,7 @@ describe('Skills', () => {
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('title', 'html')
 			.field('content', 'html is awesomee')
-			.attach('skillImage', fs.readFileSync('malume.png'), 'malume.png')
+			.attach('skillImage', fs.readFileSync('./test/malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');

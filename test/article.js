@@ -67,7 +67,8 @@ describe('Articles', () => {
 		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('content', 'html is awesomee')
-		 .attach('articleImage', fs.readFileSync('malume.png'), 'malume.png')
+		 .attach('articleImage',
+		   fs.readFileSync('./test/malume.png'), 'malume.png')
 		.end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
@@ -76,7 +77,7 @@ describe('Articles', () => {
 				res.body.errors.title.should.have.property('kind').eql('required');
 			done();
 		});
-	});
+	 });
    });
    //end here
 	//start
@@ -87,7 +88,8 @@ describe('Articles', () => {
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('title', 'html')
 			.field('content', 'html is awesomee')
-			.attach('articleImage', fs.readFileSync('malume.png'), 'malume.png')
+			.attach('articleImage', 
+			  fs.readFileSync('./test/malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');

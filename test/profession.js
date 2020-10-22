@@ -66,7 +66,7 @@ describe('Professions', () => {
 		 .set('Authorization', token)
 		 .set('Content-Type', 'application/x-www-form-urlencoded')
 		 .field('welcomeMessage', 'hello welcome')
-		 .attach('professionImage', fs.readFileSync('malume.png'), 'malume.png')
+		 .attach('professionImage', fs.readFileSync('./test/malume.png'), 'malume.png')
 	   .end((err, res) => {
 			res.should.have.status(200);
 			res.body.should.be.a('object');
@@ -85,7 +85,7 @@ describe('Professions', () => {
 			.set('Content-Type', 'application/x-www-form-urlencoded')
 			.field('welcomeMessage', 'Hello')
 			.field('professionTitle', 'web dev')
-			.attach('professionImage', fs.readFileSync('malume.png'), 'malume.png')
+			.attach('professionImage', fs.readFileSync('./test/malume.png'), 'malume.png')
 		  .end((err, res) => {
 				res.should.have.status(200);
 				res.body.should.be.a('object');
