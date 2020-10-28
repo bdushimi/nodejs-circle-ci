@@ -10,33 +10,10 @@ let port = process.env.PORT || 3000;
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
-// const swaggerOptions = {
-// 	swaggerDefinition: {
-// 		//openapi: '3.0.3',
-// 		info: {
-// 			title: 'Customer API',
-// 			description: 'Customer API Information',
-// 			contact:{
-// 				name: 'KABANO Gilles'
-// 			},
-// 			servers: ["http://localhost:3000"]
-// 		}
-// 	},
-// 	securityDefinitions: {
-// 		bearer: {
-// 		  type: "apiKey",
-// 		  name: "Authorization",
-// 		  in: "header"
-// 		}
-// 	},
-// 	//['.routes/*.js']
-// 	apis: ['./app/routes/*.js']
-// };
 
-// ---working code -----
 const swaggerOptions = {
 	swaggerDefinition: {
-	  openapi: '3.0.0', // YOU NEED THIS
+	  openapi: '3.0.0', 
 	  info: {
 		title: 'Personal blog API',
 		version: '1.0.0',
@@ -75,7 +52,7 @@ const querieRoutes = require("./app/routes/querie");
 const commentRoutes = require("./app/routes/comment");
 
 
-//const db = require('./db.js');
+
 let config = require('config'); //we load the db location from the JSON files
 //db options
 let options = { 
@@ -83,10 +60,6 @@ let options = {
                 replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } } 
               }; 
 
-//db connection      
-// mongoose.connect(config.DBHost, options);
-// let db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'connection error:'));
 mongoose.set('useUnifiedTopology', true);
 
 mongoose.connect(config.DBHost, options, { useNewUrlParser: true }, (err) => {
