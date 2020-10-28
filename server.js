@@ -7,6 +7,64 @@ let bodyParser = require('body-parser');
 let port = process.env.PORT || 3000;
 
 
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+// const swaggerOptions = {
+// 	swaggerDefinition: {
+// 		//openapi: '3.0.3',
+// 		info: {
+// 			title: 'Customer API',
+// 			description: 'Customer API Information',
+// 			contact:{
+// 				name: 'KABANO Gilles'
+// 			},
+// 			servers: ["http://localhost:3000"]
+// 		}
+// 	},
+// 	securityDefinitions: {
+// 		bearer: {
+// 		  type: "apiKey",
+// 		  name: "Authorization",
+// 		  in: "header"
+// 		}
+// 	},
+// 	//['.routes/*.js']
+// 	apis: ['./app/routes/*.js']
+// };
+
+// ---working code -----
+const swaggerOptions = {
+	swaggerDefinition: {
+	  openapi: '3.0.0', // YOU NEED THIS
+	  info: {
+		title: 'Personal blog API',
+		version: '1.0.0',
+		description: 'Your API description'
+	  },
+	  basePath: '/',
+	  components: {
+		securitySchemes: {
+		  bearerAuth: {
+			type: 'http',
+			scheme: 'bearer',
+			in: 'header',
+			bearerFormat: 'JWT',
+		  }
+		}
+	  },
+	  security: [{
+		bearerAuth: []
+	  }]
+	},
+	apis: ['./app/routes/*.js']
+  };
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+
 //call routes
 const articleRoutes = require("./app/routes/article");
 const userRoutes = require("./app/routes/user");
